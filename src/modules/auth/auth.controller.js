@@ -4,19 +4,19 @@ import { authService } from './auth.service.js';
 import { setTokenCookie, clearTokenCookie } from '../../core/utils/token.js';
 
 const register = async (req, res) => {
-  const { username, password } = req.body;
+  const { name, password, email, admin_address, office_address, phone1, phone2 } = req.body;
 
-  const result = await authService.registerAdmin({ username, password });
+  const result = await authService.registerAdmin({ name, password, email, admin_address, office_address, phone1, phone2 });
 
   return res.status(201).json(
-    new ApiResponse(210, result, 'Admin user created successfully')
+    new ApiResponse(201, result, 'Admin user created successfully')
   );
 };
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  const { admin, token } = await authService.loginAdmin({ username, password });
+  const { admin, token } = await authService.loginAdmin({ email, password });
 
   setTokenCookie(res, token);
 

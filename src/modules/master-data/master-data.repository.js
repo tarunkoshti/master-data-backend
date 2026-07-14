@@ -11,13 +11,28 @@ const getChildrenByParentId = async (parentId) => {
 };
 
 const getAllMasterData = async (filter) => {
-    const { is_active } = filter;
-    let query = 'SELECT * FROM master_data';
+    const { is_active, category, type, parent_id } = filter;
+    let query = 'SELECT * FROM master_data WHERE 1=1';
     const queryParams = [];
 
     if (is_active !== undefined) {
-        query += ' WHERE is_active = ?';
+        query += ' AND is_active = ?';
         queryParams.push(is_active);
+    }
+    
+    if (category) {
+        query += ' AND category = ?';
+        queryParams.push(category);
+    }
+    
+    if (type) {
+        query += ' AND type = ?';
+        queryParams.push(type);
+    }
+    
+    if (parent_id) {
+        query += ' AND parent_id = ?';
+        queryParams.push(parent_id);
     }
 
     query += ' ORDER BY sort_order ASC';
@@ -108,38 +123,6 @@ const getItemsByType = async (type) => {
     return rows;
 };
 
-const getMasterDataByCategory = async (filter) => {
-    const { category, is_active } = filter;
-    let query = 'SELECT * FROM master_data WHERE category = ?';
-    const queryParams = [category];
-
-    if (is_active !== undefined) {
-        query += ' AND is_active = ?';
-        queryParams.push(is_active);
-    }
-
-    query += ' ORDER BY sort_order ASC';
-
-    const [rows] = await pool.query(query, queryParams);
-    return rows;
-};
-
-const getMasterDataByParentId = async (filter) => {
-    const { parent_id, is_active } = filter;
-    let query = 'SELECT * FROM master_data WHERE parent_id = ?';
-    const queryParams = [parent_id];
-
-    if (is_active !== undefined) {
-        query += ' AND is_active = ?';
-        queryParams.push(is_active);
-    }
-
-    query += ' ORDER BY sort_order ASC';
-
-    const [rows] = await pool.query(query, queryParams);
-    return rows;
-};
-
 export const masterDatasRepository = {
     getAllMasterData,
     createMasterData,
@@ -147,9 +130,7 @@ export const masterDatasRepository = {
     deleteMasterDataById,
     updateMasterDataStatusById,
     reorderMasterData,
-    getMasterDataByCategory,
     getMasterDataById,
     getChildrenByParentId,
-    getMasterDataByParentId,
     getItemsByType
 };

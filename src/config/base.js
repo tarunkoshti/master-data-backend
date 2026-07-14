@@ -14,3 +14,9 @@ export const db = {
   user: process.env.DB_USER || '',
   password: process.env.DB_PASSWORD || '',
 };
+
+export const redisConfig = {
+  host: process.env.REDIS_HOST || '',
+  port: process.env.REDIS_PORT || '',
+  isRedisEnabled: process.env.IS_REDIS_ENABLED === 'true',
+};

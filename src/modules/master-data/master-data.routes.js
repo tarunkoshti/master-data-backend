@@ -9,8 +9,6 @@ import {
     updateSchema,
     deleteSchema,
     updateStatusSchema,
-    getByCategorySchema,
-    getByParentIdSchema,
     reorderSchema
 } from './master-data.schema.js';
 
@@ -24,8 +22,6 @@ router.put('/:id', validate(updateSchema), asyncHandler(masterDataController.upd
 router.delete('/:id', validate(deleteSchema), asyncHandler(masterDataController.deleteMasterDataById));
 router.patch('/:id/status', validate(updateStatusSchema), asyncHandler(masterDataController.updateMasterDataStatusById));
 router.patch('/:type/reorder', validate(reorderSchema), asyncHandler(masterDataController.reorderMasterData));
-router.get('/parent/:parent_id', validate(getByParentIdSchema), asyncHandler(masterDataController.getMasterDataByParentId));
-router.get('/:category', validate(getByCategorySchema), asyncHandler(masterDataController.getMasterDataByCategory));
 
 
 export default router;

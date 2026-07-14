@@ -3,38 +3,44 @@ import { ApiError } from '../../core/utils/ApiError.js';
 import { authRepository } from './auth.repository.js';
 import { generateToken } from '../../core/utils/token.js';
 
-const registerAdmin = async ({ username, password }) => {
-  const existing = await authRepository.findByUsername(username);
+const registerAdmin = async ({ name, password, email, admin_address, office_address, phone1, phone2 }) => {
+  const existing = await authRepository.findByEmail(email);
   if (existing) {
-    throw new ApiError(400, 'Admin username already registered');
+    throw new ApiError(400, 'Admin email already registered');
   }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
   const result = await authRepository.createAdmin({
-    username,
+    name,
     password: hashedPassword,
+    email,
+    admin_address,
+    office_address,
+    phone1,
+    phone2,
   });
 
-  return { id: result.insertId, username };
+  return { id: result.insertId, email, name };
 };
 
-const loginAdmin = async ({ username, password }) => {
-  const admin = await authRepository.findByUsername(username);
+const loginAdmin = async ({ email, password }) => {
+  const admin = await authRepository.findByEmail(email);
   if (!admin) {
-    throw new ApiError(401, 'Invalid username or password');
+    throw new ApiError(401, 'Invalid email or password');
   }
 
   const isValidPassword = await bcrypt.compare(password, admin.password);
   if (!isValidPassword) {
-    throw new ApiError(401, 'Invalid username or password');
+    throw new ApiError(401, 'Invalid email or password');
   }
 
-  const token = generateToken({ id: admin.id, username: admin.username });
+  // Token includes admin_id as id and email
+  const token = generateToken({ id: admin.admin_id, email: admin.email });
 
   return {
-    admin: { id: admin.id, username: admin.username },
+    admin: { id: admin.admin_id, email: admin.email, name: admin.name },
     token,
   };
 };

@@ -2,7 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './core/middlewares/errorHandler.js';
-import logger from './core/utils/logger.js';
+import Logger from './core/utils/logger.js';
 import apiRoutes from './core/routes/index.js';
 import pool from './config/db.js';
 import { frontendUrl } from './config/base.js';
@@ -11,10 +11,10 @@ import { frontendUrl } from './config/base.js';
 const connectDb = async () => {
     try {
         const connection = await pool.getConnection();
-        logger.info("Database connected successfully");
+        Logger.info("Database connected successfully");
         connection.release();
     } catch (err) {
-        logger.error("Database connection failed: " + err.message);
+        Logger.error("Database connection failed: " + err.message);
     }
 }
 connectDb();
@@ -23,7 +23,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use((req, res, next) => {
-    logger.info(`${req.method} ${req.originalUrl} from ${req.ip} (Origin: ${req.get('origin')})`);
+    Logger.info(`${req.method} ${req.originalUrl} from ${req.ip} (Origin: ${req.get('origin')})`);
     next();
 });
 

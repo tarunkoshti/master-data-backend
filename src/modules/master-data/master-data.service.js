@@ -72,12 +72,8 @@ const reorderMasterData = async (type, ids) => {
     return true;
 };
 
-const getMasterDataByCategory = async (filter) => {
-    return await masterDatasRepository.getMasterDataByCategory(filter);
-};
-
-const getMasterDataByParentId = async (filter) => {
-    return await masterDatasRepository.getMasterDataByParentId(filter);
+const getMasterDataById = async (id) => {
+    return await masterDatasRepository.getMasterDataById(id);
 };
 
 export const masterDataService = {
@@ -87,6 +83,5 @@ export const masterDataService = {
     deleteMasterDataById,
     updateMasterDataStatusById,
     reorderMasterData,
-    getMasterDataByCategory,
-    getMasterDataByParentId,
+    getMasterDataById,
 };

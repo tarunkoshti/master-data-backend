@@ -12,24 +12,9 @@ const idParam = z.preprocess((val) => Number(val), z.number().positive('Valid Ma
 export const getAllSchema = z.object({
     query: z.object({
         is_active: isActiveCoerce,
-    })
-});
-
-export const getByCategorySchema = z.object({
-    params: z.object({
-        category: z.string().min(1, 'Category is required'),
-    }),
-    query: z.object({
-        is_active: isActiveCoerce,
-    })
-});
-
-export const getByParentIdSchema = z.object({
-    params: z.object({
-        parent_id: idParam,
-    }),
-    query: z.object({
-        is_active: isActiveCoerce,
+        category: z.string().optional(),
+        type: z.string().optional(),
+        parent_id: z.preprocess((val) => val === undefined ? undefined : Number(val), z.number().optional()),
     })
 });
 
