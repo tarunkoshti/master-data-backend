@@ -45,7 +45,26 @@ const loginAdmin = async ({ email, password }) => {
   };
 };
 
+const changePassword = async ({ adminId, oldPassword, newPassword }) => {
+  const admin = await authRepository.findById(adminId);
+  if (!admin) {
+    throw new ApiError(404, 'Admin not found');
+  }
+
+  const isValidPassword = await bcrypt.compare(oldPassword, admin.password);
+  if (!isValidPassword) {
+    throw new ApiError(400, 'Invalid old password');
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+  await authRepository.updatePassword(adminId, hashedPassword);
+  return true;
+};
+
 export const authService = {
   registerAdmin,
   loginAdmin,
+  changePassword,
 };

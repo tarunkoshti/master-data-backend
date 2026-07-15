@@ -6,11 +6,6 @@ import { getStoredKey, setStoredKey, clearCachePattern } from "../../core/cache/
 import { CACHE_TTL } from "../../core/cache/ttl.js";
 
 const clearMasterDataCacheForRecord = async (record) => {
-    await clearCachePattern(`masterData:all`);
-
-    if (record?.category) {
-        await clearCachePattern(`masterData:*category:${record.category}*`);
-    }
     if (record?.type) {
         await clearCachePattern(`masterData:*type:${record.type}*`);
     }
@@ -21,21 +16,16 @@ const clearMasterDataCacheForRecord = async (record) => {
 
 const getAllMasterData = async (req, res) => {
     const filter = {};
+    const { type, parent_id } = req.query;
 
-    if (req.query.category) {
-        filter.category = req.query.category;
+    if (type) {
+        filter.type = type;
+    } else {
+        throw new ApiError(400, 'type is required');
     }
 
-    if (req.query.type) {
-        filter.type = req.query.type;
-    }
-
-    if (req.query.parent_id) {
-        filter.parent_id = req.query.parent_id;
-    }
-
-    if (req.query.is_active !== undefined) {
-        filter.is_active = req.query.is_active;
+    if (parent_id) {
+        filter.parent_id = parent_id;
     }
 
     const cacheKey = masterDataKeyGenerator(filter);
@@ -48,10 +38,6 @@ const getAllMasterData = async (req, res) => {
 
     const result = await masterDataService.getAllMasterData(filter);
 
-    if (result.length === 0) {
-        throw new ApiError(404, 'No master data not found');
-    }
-
     await setStoredKey(cacheKey, result, CACHE_TTL);
 
     return res.status(200).json(
@@ -60,10 +46,10 @@ const getAllMasterData = async (req, res) => {
 };
 
 const createMasterData = async (req, res) => {
-    const { category, type, value, name, parent_id } = req.body;
-    const result = await masterDataService.createMasterData({ category, type, value, name, parent_id });
+    const { type, name, parent_id } = req.body;
+    const result = await masterDataService.createMasterData({ type, name, parent_id });
 
-    await clearMasterDataCacheForRecord({ category, type, parent_id });
+    await clearMasterDataCacheForRecord({ type, parent_id });
 
     return res.status(201).json(
         new ApiResponse(201, result, 'Master data created successfully')
@@ -72,81 +58,47 @@ const createMasterData = async (req, res) => {
 
 const updateMasterDataById = async (req, res) => {
     const { id } = req.params;
+    const { type, name, parent_id } = req.body;
 
-    const existing = await masterDataService.getMasterDataById(id);
+    const existing = await masterDataService.getMasterDataById(id, type);
     if (existing) {
-        await clearMasterDataCacheForRecord(existing);
+        await clearMasterDataCacheForRecord({ type, parent_id: existing.parent_id });
     }
 
-    const { category, type, value, name, parent_id } = req.body;
-    const result = await masterDataService.updateMasterDataById(id, { category, type, value, name, parent_id });
+    const result = await masterDataService.updateMasterDataById(id, { type, name, parent_id });
 
-    await clearMasterDataCacheForRecord({ category, type, parent_id });
+    await clearMasterDataCacheForRecord({ type, parent_id });
 
     return res.status(200).json(
         new ApiResponse(200, result, 'Master data updated successfully')
     );
 };
 
-const deleteMasterDataById = async (req, res) => {
-    const { id } = req.params;
-    const existing = await masterDataService.getMasterDataById(id);
+// const deleteMasterDataById = async (req, res) => {
+//     const { id } = req.params;
+//     const { type } = req.query;
+// 
+//     if (!type) {
+//         throw new ApiError(400, 'type is required to delete');
+//     }
+// 
+//     const existing = await masterDataService.getMasterDataById(id, type);
+// 
+//     await masterDataService.deleteMasterDataById(id, type);
+// 
+//     if (existing) {
+//         await clearMasterDataCacheForRecord({ type, parent_id: existing.parent_id || existing.state_id || existing.country_id });
+//     }
+// 
+//     return res.status(200).json(
+//         new ApiResponse(200, null, 'Master data deleted successfully')
+//     );
+// };
 
-    await masterDataService.deleteMasterDataById(id);
-
-    if (existing) {
-        await clearMasterDataCacheForRecord(existing);
-    }
-
-    return res.status(200).json(
-        new ApiResponse(200, null, 'Master data deleted successfully')
-    );
-};
-
-const updateMasterDataStatusById = async (req, res) => {
-    const { id } = req.params;
-    const existing = await masterDataService.getMasterDataById(id);
-
-    const { is_active } = req.body;
-    const result = await masterDataService.updateMasterDataStatusById(id, is_active);
-
-    if (existing) {
-        await clearMasterDataCacheForRecord(existing);
-    }
-
-    return res.status(200).json(
-        new ApiResponse(200, result, 'Master data status updated successfully')
-    );
-};
-
-const reorderMasterData = async (req, res) => {
-    const { type } = req.params;
-    const { ids } = req.body;
-
-    let category = null;
-    let parent_id = null;
-    if (ids && ids.length > 0) {
-        const existing = await masterDataService.getMasterDataById(ids[0]);
-        if (existing) {
-            category = existing.category;
-            parent_id = existing.parent_id;
-        }
-    }
-
-    await masterDataService.reorderMasterData(type, ids);
-
-    await clearMasterDataCacheForRecord({ category, type, parent_id });
-
-    return res.status(200).json(
-        new ApiResponse(200, null, 'Master data reordered successfully')
-    );
-};
 
 export const masterDataController = {
     getAllMasterData,
     createMasterData,
     updateMasterDataById,
-    deleteMasterDataById,
-    updateMasterDataStatusById,
-    reorderMasterData,
+    // deleteMasterDataById,
 };

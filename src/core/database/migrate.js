@@ -3,6 +3,7 @@ import Logger from "../utils/logger.js";
 
 const migrate = async () => {
     try {
+        /*
         await pool.query(`
             CREATE TABLE IF NOT EXISTS master_data (
                 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -20,6 +21,7 @@ const migrate = async () => {
                 UNIQUE KEY uk_type_value (type, value)
             );
         `);
+        */
 
         Logger.info("Master data table migration completed.");
 

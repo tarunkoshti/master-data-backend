@@ -1,136 +1,118 @@
 import pool from '../../config/db.js';
 
-const getMasterDataById = async (id) => {
-    const [rows] = await pool.query('SELECT * FROM master_data WHERE id = ?', [id]);
+const TABLE_MAP = {
+    'zodiacs': { table: 'zodiacs', parentCol: null },
+    'subcastes': { table: 'subcastes', parentCol: null },
+    'states': { table: 'states', parentCol: 'country_id' },
+    'relations': { table: 'relations', parentCol: null },
+    'professions': { table: 'professions', parentCol: null },
+    'occupations': { table: 'occupations', parentCol: null },
+    'nakshatras': { table: 'nakshatras', parentCol: null },
+    'mother_tongues': { table: 'mother_tongues', parentCol: null },
+    'marital_status': { table: 'marital_status', parentCol: null },
+    'manglik_status': { table: 'manglik_status', parentCol: null },
+    'heights': { table: 'heights', parentCol: null },
+    'gotras': { table: 'gotras', parentCol: null },
+    'genders': { table: 'genders', parentCol: null },
+    'educations': { table: 'educations', parentCol: null },
+    'disabilities': { table: 'disabilities', parentCol: null },
+    'diets': { table: 'diets', parentCol: null },
+    'countries': { table: 'countries', parentCol: null },
+    'complexions': { table: 'complexions', parentCol: null },
+    'cities': { table: 'cities', parentCol: 'state_id' },
+    'blood_groups': { table: 'blood_groups', parentCol: null },
+    'annual_incomes': { table: 'annual_incomes', parentCol: null },
+    'house': { table: 'house', parentCol: null },
+    'car': { table: 'car', parentCol: null },
+};
+
+const getMasterDataById = async (id, type) => {
+    const config = TABLE_MAP[type];
+    if (!config) return null;
+    const [rows] = await pool.query(`SELECT * FROM ${config.table} WHERE id = ?`, [id]);
     return rows[0];
 };
 
-const getChildrenByParentId = async (parentId) => {
-    const [rows] = await pool.query('SELECT * FROM master_data WHERE parent_id = ?', [parentId]);
-    return rows;
-};
-
 const getAllMasterData = async (filter) => {
-    const { is_active, category, type, parent_id } = filter;
-    let query = 'SELECT * FROM master_data WHERE 1=1';
+    const { type, parent_id } = filter;
+
+    if (!type || !TABLE_MAP[type]) {
+        return [];
+    }
+
+    const config = TABLE_MAP[type];
+    let query = `SELECT * FROM ${config.table} WHERE 1=1`;
     const queryParams = [];
 
-    if (is_active !== undefined) {
-        query += ' AND is_active = ?';
-        queryParams.push(is_active);
-    }
-    
-    if (category) {
-        query += ' AND category = ?';
-        queryParams.push(category);
-    }
-    
-    if (type) {
-        query += ' AND type = ?';
-        queryParams.push(type);
-    }
-    
-    if (parent_id) {
-        query += ' AND parent_id = ?';
+    if (parent_id && config.parentCol) {
+        query += ` AND ${config.parentCol} = ?`;
         queryParams.push(parent_id);
     }
 
-    query += ' ORDER BY sort_order ASC';
-
-    const [rows] = await pool.query(query, queryParams);
-    return rows;
-};
-
-const createMasterData = async (data) => {
-    const { category, type, value, name, parent_id } = data;
-
-    const [maxResult] = await pool.query('SELECT MAX(sort_order) as maxOrder FROM master_data WHERE type = ?', [type]);
-    const maxOrder = maxResult[0].maxOrder;
-    const sort_order = maxOrder !== null ? maxOrder + 1 : 0;
-
-    const [result] = await pool.query(
-        'INSERT INTO master_data (category, type, value, name, parent_id, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
-        [category, type, value, name, parent_id || null, sort_order]
-    );
-    return getMasterDataById(result.insertId);
-};
-
-const updateMasterDataById = async (id, data) => {
-    const { category, type, value, name, parent_id } = data;
-    await pool.query(
-        'UPDATE master_data SET category = ?, type = ?, value = ?, name = ?, parent_id = ? WHERE id = ?',
-        [category, type, value, name, parent_id || null, id]
-    );
-    return getMasterDataById(id);
-};
-
-const deleteMasterDataById = async (id) => {
-    const connection = await pool.getConnection();
     try {
-        await connection.beginTransaction();
+        const [rows] = await pool.query(query, queryParams);
 
-        const [rows] = await connection.query('SELECT type, sort_order FROM master_data WHERE id = ? FOR UPDATE', [id]);
-        if (rows.length === 0) {
-            await connection.rollback();
-            return 0;
-        }
-        const { type, sort_order } = rows[0];
-
-        const [result] = await connection.query('DELETE FROM master_data WHERE id = ?', [id]);
-
-        if (result.affectedRows > 0) {
-            await connection.query(
-                'UPDATE master_data SET sort_order = sort_order - 1 WHERE type = ? AND sort_order > ?',
-                [type, sort_order]
-            );
-        }
-
-        await connection.commit();
-        return result.affectedRows;
+        // Return the rows directly to avoid unnecessary mapping
+        return rows;
     } catch (error) {
-        await connection.rollback();
-        throw error;
-    } finally {
-        connection.release();
+        console.error(`Error querying master data for type '${type}':`, error.message);
+        return []; // Return empty instead of crashing on unconfigured tables
     }
 };
 
-const updateMasterDataStatusById = async (id, is_active) => {
-    await pool.query('UPDATE master_data SET is_active = ? WHERE id = ?', [is_active, id]);
-    return getMasterDataById(id);
+const createMasterData = async (data) => {
+    const { type, name, parent_id } = data;
+    const config = TABLE_MAP[type];
+
+    if (!config) throw new Error("Invalid type");
+
+    if (config.parentCol && parent_id) {
+        const [result] = await pool.query(
+            `INSERT INTO ${config.table} (name, ${config.parentCol}) VALUES (?, ?)`,
+            [name, parent_id]
+        );
+        return getMasterDataById(result.insertId, type);
+    } else {
+        const [result] = await pool.query(
+            `INSERT INTO ${config.table} (name) VALUES (?)`,
+            [name]
+        );
+        return getMasterDataById(result.insertId, type);
+    }
 };
 
-const reorderMasterData = async (ids) => {
-    if (!ids || ids.length === 0) return;
+const updateMasterDataById = async (id, data) => {
+    const { type, name, parent_id } = data;
+    const config = TABLE_MAP[type];
+    if (!config) throw new Error("Invalid type");
 
-    const cases = ids
-        .map((id, index) => `WHEN ${id} THEN ${index}`)
-        .join(" ");
+    if (config.parentCol && parent_id) {
+        await pool.query(
+            `UPDATE ${config.table} SET name = ?, ${config.parentCol} = ? WHERE id = ?`,
+            [name, parent_id, id]
+        );
+    } else {
+        await pool.query(
+            `UPDATE ${config.table} SET name = ? WHERE id = ?`,
+            [name, id]
+        );
+    }
 
-    const sql = `
-        UPDATE master_data
-        SET sort_order = CASE id
-            ${cases}
-        END
-        WHERE id IN (${ids.join(",")})
-    `;
-
-    await pool.query(sql);
+    return getMasterDataById(id, type);
 };
 
-const getItemsByType = async (type) => {
-    const [rows] = await pool.query('SELECT * FROM master_data WHERE type = ?', [type]);
-    return rows;
-};
+// const deleteMasterDataById = async (id, type) => {
+//     const config = TABLE_MAP[type];
+//     if (!config) throw new Error("Invalid type");
+// 
+//     const [result] = await pool.query(`DELETE FROM ${config.table} WHERE id = ?`, [id]);
+//     return result.affectedRows;
+// };
 
 export const masterDatasRepository = {
+    getMasterDataById,
     getAllMasterData,
     createMasterData,
     updateMasterDataById,
-    deleteMasterDataById,
-    updateMasterDataStatusById,
-    reorderMasterData,
-    getMasterDataById,
-    getChildrenByParentId,
-    getItemsByType
+    // deleteMasterDataById,
 };

@@ -23,7 +23,33 @@ const createAdmin = async ({ name, password, email, admin_address, office_addres
   return result;
 };
 
+const findById = async (id) => {
+  const [rows] = await pool.query(
+    `
+    SELECT *
+    FROM admin
+    WHERE admin_id = ?
+    `,
+    [id]
+  );
+  return rows[0] || null;
+};
+
+const updatePassword = async (id, newPassword) => {
+  const [result] = await pool.query(
+    `
+    UPDATE admin
+    SET password = ?
+    WHERE admin_id = ?
+    `,
+    [newPassword, id]
+  );
+  return result;
+};
+
 export const authRepository = {
   findByEmail,
   createAdmin,
+  findById,
+  updatePassword,
 };

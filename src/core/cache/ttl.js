@@ -1,1 +1,1 @@
-export const CACHE_TTL = 3600;
+export const CACHE_TTL = 21600; // 6 hours in seconds

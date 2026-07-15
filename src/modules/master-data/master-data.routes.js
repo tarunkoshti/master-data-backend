@@ -7,9 +7,7 @@ import {
     getAllSchema,
     createSchema,
     updateSchema,
-    deleteSchema,
-    updateStatusSchema,
-    reorderSchema
+    deleteSchema
 } from './master-data.schema.js';
 
 const router = express.Router();
@@ -19,9 +17,6 @@ router.use(authHandler);
 router.get('/', validate(getAllSchema), asyncHandler(masterDataController.getAllMasterData));
 router.post('/', validate(createSchema), asyncHandler(masterDataController.createMasterData));
 router.put('/:id', validate(updateSchema), asyncHandler(masterDataController.updateMasterDataById));
-router.delete('/:id', validate(deleteSchema), asyncHandler(masterDataController.deleteMasterDataById));
-router.patch('/:id/status', validate(updateStatusSchema), asyncHandler(masterDataController.updateMasterDataStatusById));
-router.patch('/:type/reorder', validate(reorderSchema), asyncHandler(masterDataController.reorderMasterData));
-
+// router.delete('/:id', validate(deleteSchema), asyncHandler(masterDataController.deleteMasterDataById));
 
 export default router;

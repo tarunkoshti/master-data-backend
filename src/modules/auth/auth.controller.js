@@ -39,9 +39,21 @@ const me = async (req, res) => {
   );
 };
 
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const adminId = req.user.id; // From auth middleware
+
+  await authService.changePassword({ adminId, oldPassword, newPassword });
+
+  return res.status(200).json(
+    new ApiResponse(200, null, 'Password changed successfully')
+  );
+};
+
 export const authController = {
   register,
   login,
   logout,
   me,
+  changePassword,
 };
