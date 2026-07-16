@@ -44,7 +44,7 @@ const getAllMasterData = async (filter) => {
     let query = `SELECT * FROM ${config.table} WHERE 1=1`;
     const queryParams = [];
 
-    if (parent_id && config.parentCol) {
+    if (parent_id !== undefined && config.parentCol) {
         query += ` AND ${config.parentCol} = ?`;
         queryParams.push(parent_id);
     }
@@ -66,7 +66,7 @@ const createMasterData = async (data) => {
 
     if (!config) throw new Error("Invalid type");
 
-    if (config.parentCol && parent_id) {
+    if (config.parentCol && parent_id !== undefined) {
         const [result] = await pool.query(
             `INSERT INTO ${config.table} (name, ${config.parentCol}) VALUES (?, ?)`,
             [name, parent_id]
@@ -86,7 +86,7 @@ const updateMasterDataById = async (id, data) => {
     const config = TABLE_MAP[type];
     if (!config) throw new Error("Invalid type");
 
-    if (config.parentCol && parent_id) {
+    if (config.parentCol && parent_id !== undefined) {
         await pool.query(
             `UPDATE ${config.table} SET name = ?, ${config.parentCol} = ? WHERE id = ?`,
             [name, parent_id, id]

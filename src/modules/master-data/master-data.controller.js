@@ -24,7 +24,7 @@ const getAllMasterData = async (req, res) => {
         throw new ApiError(400, 'type is required');
     }
 
-    if (parent_id) {
+    if (parent_id !== undefined) {
         filter.parent_id = parent_id;
     }
 

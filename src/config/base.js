@@ -1,11 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import path from 'path';
 
 export const environment = process.env.NODE_ENV;
 export const port = process.env.PORT;
 export const frontendUrl = process.env.FRONTEND_URL;
 export const jwtSecret = process.env.JWT_SECRET;
 export const apiKey = process.env.API_KEY;
+export const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');;
 
 export const db = {
   port: process.env.DB_PORT || '',

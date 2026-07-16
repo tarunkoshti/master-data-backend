@@ -23,7 +23,19 @@ const migrate = async () => {
         `);
         */
 
-        Logger.info("Master data table migration completed.");
+        // await pool.query(`
+        //     CREATE TABLE IF NOT EXISTS user_intros (
+        //         id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        //         profile_id INT UNSIGNED NOT NULL,
+        //         app_id VARCHAR(255) DEFAULT NULL,
+        //         video_url_link TEXT NOT NULL,
+        //         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        //         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        //         UNIQUE KEY uk_profile_id (profile_id)
+        //     );
+        // `);
+
+        // Logger.info("Database migration completed.");
 
         process.exit(0);
     } catch (error) {

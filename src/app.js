@@ -5,7 +5,7 @@ import { errorHandler } from './core/middlewares/errorHandler.js';
 import Logger from './core/utils/logger.js';
 import apiRoutes from './core/routes/index.js';
 import pool from './config/db.js';
-import { frontendUrl } from './config/base.js';
+import { frontendUrl, uploadDir } from './config/base.js';
 
 // Verify database connection
 const connectDb = async () => {
@@ -48,6 +48,8 @@ app.use(cors({
 }));
 
 // Routes
+const UPLOADS_DIR = uploadDir;
+app.use('/uploads', express.static(UPLOADS_DIR));
 app.use('/api/v1', apiRoutes);
 app.get('/', (req, res) => res.send('ok'));
 

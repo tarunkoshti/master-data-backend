@@ -4,7 +4,6 @@ const idParam = z.preprocess((val) => Number(val), z.number().positive('Valid Ma
 
 const masterDataBodySchema = z.object({
     type: z.string().min(1, 'Type is required'),
-    value: z.string().optional(),
     name: z.string().min(1, 'Name is required'),
     parent_id: z.number().int().positive().optional().nullable(),
 }).refine(data => {
