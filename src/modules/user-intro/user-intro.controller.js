@@ -10,25 +10,25 @@ const uploadUserIntro = async (req, res) => {
 
     const existingIntro = await userIntroService.getUserIntroByProfileId(profile_id);
     if (existingIntro) {
-        return res.status(309).json(new ApiResponse(309, null, 'User intro already exists for this profile'));
+        return res.status(409).json(new ApiResponse(409, null, 'User intro already exists for this profile'));
     }
 
     if (!video_file) {
-        return res.status(300).json(new ApiResponse(300, null, 'Video not uploaded'));
+        return res.status(400).json(new ApiResponse(400, null, 'Video not uploaded'));
     }
 
     try {
         const duration = await getVideoDuration(video_file.path);
         if (duration >= 30) {
             await deleteFile(video_file.path);
-            return res.status(300).json(new ApiResponse(300, null, 'Video duration cannot exceed 30 seconds'));
+            return res.status(400).json(new ApiResponse(400, null, 'Video duration cannot exceed 30 seconds'));
         }
         // Compress the video
         await compressVideo(video_file.path);
 
     } catch (error) {
         await deleteFile(video_file.path);
-        return res.status(300).json(new ApiResponse(300, null, 'Invalid video file or error processing video'));
+        return res.status(400).json(new ApiResponse(400, null, 'Invalid video file or error processing video'));
     }
 
     let video_url_link = generateFileUrl(req, USER_INTRO_VIDEOS_FOLDER, video_file.filename);
@@ -66,21 +66,21 @@ const updateUserIntro = async (req, res) => {
     }
 
     if (!video_file) {
-        return res.status(300).json(new ApiResponse(300, null, 'Video not uploaded for update'));
+        return res.status(400).json(new ApiResponse(400, null, 'Video not uploaded for update'));
     }
 
     try {
         const duration = await getVideoDuration(video_file.path);
         if (duration >= 30) {
             await deleteFile(video_file.path);
-            return res.status(300).json(new ApiResponse(300, null, 'Video duration cannot exceed 30 seconds'));
+            return res.status(400).json(new ApiResponse(400, null, 'Video duration cannot exceed 30 seconds'));
         }
 
         // Compress the video
         await compressVideo(video_file.path);
     } catch (error) {
         await deleteFile(video_file.path);
-        return res.status(300).json(new ApiResponse(300, null, 'Invalid video file or error processing video'));
+        return res.status(400).json(new ApiResponse(400, null, 'Invalid video file or error processing video'));
     }
 
     const updateData = {
