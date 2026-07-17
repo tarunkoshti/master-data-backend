@@ -1,7 +1,7 @@
 import { ApiResponse } from "../../core/utils/ApiResponse.js";
 import { userIntroService } from "./user-intro.service.js";
 import { USER_INTRO_VIDEOS_FOLDER } from "./user-intro.constant.js";
-import { generateFileUrl, deleteFile } from "../../core/utils/fileUtils.js";
+import { generateFileUrl, deleteFile, getFilePathFromUrl } from "../../core/utils/fileUtils.js";
 import { getVideoDuration, compressVideo } from '../../core/utils/videoUtils.js';
 
 const uploadUserIntro = async (req, res) => {
@@ -20,14 +20,14 @@ const uploadUserIntro = async (req, res) => {
     try {
         const duration = await getVideoDuration(video_file.path);
         if (duration >= 30) {
-            deleteFile(video_file.path);
+            await deleteFile(video_file.path);
             return res.status(300).json(new ApiResponse(300, null, 'Video duration cannot exceed 30 seconds'));
         }
         // Compress the video
         await compressVideo(video_file.path);
 
     } catch (error) {
-        deleteFile(video_file.path);
+        await deleteFile(video_file.path);
         return res.status(300).json(new ApiResponse(300, null, 'Invalid video file or error processing video'));
     }
 
@@ -72,14 +72,14 @@ const updateUserIntro = async (req, res) => {
     try {
         const duration = await getVideoDuration(video_file.path);
         if (duration >= 30) {
-            deleteFile(video_file.path);
+            await deleteFile(video_file.path);
             return res.status(300).json(new ApiResponse(300, null, 'Video duration cannot exceed 30 seconds'));
         }
 
         // Compress the video
         await compressVideo(video_file.path);
     } catch (error) {
-        deleteFile(video_file.path);
+        await deleteFile(video_file.path);
         return res.status(300).json(new ApiResponse(300, null, 'Invalid video file or error processing video'));
     }
 
@@ -88,6 +88,11 @@ const updateUserIntro = async (req, res) => {
     };
 
     const result = await userIntroService.updateUserIntro(id, updateData);
+
+    if (existingIntro.video_url_link) {
+        const oldFilePath = getFilePathFromUrl(existingIntro.video_url_link, USER_INTRO_VIDEOS_FOLDER);
+        await deleteFile(oldFilePath);
+    }
 
     return res.status(200).json(
         new ApiResponse(200, result, 'User intro updated successfully')
@@ -103,6 +108,11 @@ const deleteUserIntro = async (req, res) => {
     }
 
     await userIntroService.deleteUserIntro(id);
+
+    if (existingIntro.video_url_link) {
+        const oldFilePath = getFilePathFromUrl(existingIntro.video_url_link, USER_INTRO_VIDEOS_FOLDER);
+        await deleteFile(oldFilePath);
+    }
 
     return res.status(200).json(
         new ApiResponse(200, null, 'User intro deleted successfully')
