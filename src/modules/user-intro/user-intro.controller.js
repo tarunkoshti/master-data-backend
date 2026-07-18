@@ -3,6 +3,7 @@ import { userIntroService } from "./user-intro.service.js";
 import { USER_INTRO_VIDEOS_FOLDER } from "./user-intro.constant.js";
 import { generateFileUrl, deleteFile, getFilePathFromUrl } from "../../core/utils/fileUtils.js";
 import { getVideoDuration, compressVideo } from '../../core/utils/videoUtils.js';
+import { HTTP_STATUS } from "../../core/constants/http-status-codes.constant.js";
 
 const uploadUserIntro = async (req, res) => {
     const { profile_id, app_id } = req.body;
@@ -10,33 +11,33 @@ const uploadUserIntro = async (req, res) => {
 
     const existingIntro = await userIntroService.getUserIntroByProfileId(profile_id);
     if (existingIntro) {
-        return res.status(409).json(new ApiResponse(409, null, 'User intro already exists for this profile'));
+        return res.status(HTTP_STATUS.CONFLICT).json(new ApiResponse(HTTP_STATUS.CONFLICT, null, 'User intro already exists for this profile'));
     }
 
     if (!video_file) {
-        return res.status(400).json(new ApiResponse(400, null, 'Video not uploaded'));
+        return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Video not uploaded'));
     }
 
     try {
         const duration = await getVideoDuration(video_file.path);
         if (duration >= 30) {
             await deleteFile(video_file.path);
-            return res.status(400).json(new ApiResponse(400, null, 'Video duration cannot exceed 30 seconds'));
+            return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Video duration cannot exceed 30 seconds'));
         }
         // Compress the video
         await compressVideo(video_file.path);
 
     } catch (error) {
         await deleteFile(video_file.path);
-        return res.status(400).json(new ApiResponse(400, null, 'Invalid video file or error processing video'));
+        return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Invalid video file or error processing video'));
     }
 
     let video_url_link = generateFileUrl(req, USER_INTRO_VIDEOS_FOLDER, video_file.filename);
 
     const result = await userIntroService.uploadUserIntro({ profile_id, app_id, video_url_link });
 
-    return res.status(201).json(
-        new ApiResponse(201, result, 'User intro uploaded successfully')
+    return res.status(HTTP_STATUS.CREATED).json(
+        new ApiResponse(HTTP_STATUS.CREATED, result, 'User intro uploaded successfully')
     );
 };
 
@@ -46,13 +47,13 @@ const getUserIntroByProfileId = async (req, res) => {
     const result = await userIntroService.getUserIntroByProfileId(profileId);
 
     if (!result) {
-        return res.status(404).json(
-            new ApiResponse(404, null, 'User intro not found')
+        return res.status(HTTP_STATUS.NOT_FOUND).json(
+            new ApiResponse(HTTP_STATUS.NOT_FOUND, null, 'User intro not found')
         );
     }
 
-    return res.status(200).json(
-        new ApiResponse(200, result, 'User intro fetched successfully')
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'User intro fetched successfully')
     );
 };
 
@@ -62,25 +63,25 @@ const updateUserIntro = async (req, res) => {
 
     const existingIntro = await userIntroService.getUserIntroById(id);
     if (!existingIntro) {
-        return res.status(404).json(new ApiResponse(404, null, 'User intro not found'));
+        return res.status(HTTP_STATUS.NOT_FOUND).json(new ApiResponse(HTTP_STATUS.NOT_FOUND, null, 'User intro not found'));
     }
 
     if (!video_file) {
-        return res.status(400).json(new ApiResponse(400, null, 'Video not uploaded for update'));
+        return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Video not uploaded for update'));
     }
 
     try {
         const duration = await getVideoDuration(video_file.path);
         if (duration >= 30) {
             await deleteFile(video_file.path);
-            return res.status(400).json(new ApiResponse(400, null, 'Video duration cannot exceed 30 seconds'));
+            return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Video duration cannot exceed 30 seconds'));
         }
 
         // Compress the video
         await compressVideo(video_file.path);
     } catch (error) {
         await deleteFile(video_file.path);
-        return res.status(400).json(new ApiResponse(400, null, 'Invalid video file or error processing video'));
+        return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Invalid video file or error processing video'));
     }
 
     const updateData = {
@@ -94,8 +95,8 @@ const updateUserIntro = async (req, res) => {
         await deleteFile(oldFilePath);
     }
 
-    return res.status(200).json(
-        new ApiResponse(200, result, 'User intro updated successfully')
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'User intro updated successfully')
     );
 };
 
@@ -104,7 +105,7 @@ const deleteUserIntro = async (req, res) => {
 
     const existingIntro = await userIntroService.getUserIntroById(id);
     if (!existingIntro) {
-        return res.status(404).json(new ApiResponse(404, null, 'User intro not found'));
+        return res.status(HTTP_STATUS.NOT_FOUND).json(new ApiResponse(HTTP_STATUS.NOT_FOUND, null, 'User intro not found'));
     }
 
     await userIntroService.deleteUserIntro(id);
@@ -114,8 +115,8 @@ const deleteUserIntro = async (req, res) => {
         await deleteFile(oldFilePath);
     }
 
-    return res.status(200).json(
-        new ApiResponse(200, null, 'User intro deleted successfully')
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, null, 'User intro deleted successfully')
     );
 };
 

@@ -1,6 +1,7 @@
 import { ApiResponse } from "../../core/utils/ApiResponse.js";
 import { masterDataService } from "./master-data.service.js";
 import { ApiError } from "../../core/utils/ApiError.js";
+import { HTTP_STATUS } from "../../core/constants/http-status-codes.constant.js";
 import { masterDataKeyGenerator } from "../../core/cache/keys.js";
 import { getStoredKey, setStoredKey, clearCachePattern } from "../../core/cache/query.js";
 import { CACHE_TTL } from "../../core/cache/ttl.js";
@@ -21,7 +22,7 @@ const getAllMasterData = async (req, res) => {
     if (type) {
         filter.type = type;
     } else {
-        throw new ApiError(400, 'type is required');
+        throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'type is required');
     }
 
     if (parent_id !== undefined) {
@@ -31,8 +32,8 @@ const getAllMasterData = async (req, res) => {
     const cacheKey = masterDataKeyGenerator(filter);
     const cached = await getStoredKey(cacheKey);
     if (cached) {
-        return res.status(200).json(
-            new ApiResponse(200, JSON.parse(cached), 'All Master data fetched successfully (Cached)')
+        return res.status(HTTP_STATUS.OK).json(
+            new ApiResponse(HTTP_STATUS.OK, JSON.parse(cached), 'All Master data fetched successfully (Cached)')
         );
     }
 
@@ -40,8 +41,8 @@ const getAllMasterData = async (req, res) => {
 
     await setStoredKey(cacheKey, result, CACHE_TTL);
 
-    return res.status(200).json(
-        new ApiResponse(200, result, 'All Master data fetched successfully')
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'All Master data fetched successfully')
     );
 };
 
@@ -51,8 +52,8 @@ const createMasterData = async (req, res) => {
 
     await clearMasterDataCacheForRecord({ type, parent_id });
 
-    return res.status(201).json(
-        new ApiResponse(201, result, 'Master data created successfully')
+    return res.status(HTTP_STATUS.CREATED).json(
+        new ApiResponse(HTTP_STATUS.CREATED, result, 'Master data created successfully')
     );
 };
 
@@ -69,8 +70,8 @@ const updateMasterDataById = async (req, res) => {
 
     await clearMasterDataCacheForRecord({ type, parent_id });
 
-    return res.status(200).json(
-        new ApiResponse(200, result, 'Master data updated successfully')
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'Master data updated successfully')
     );
 };
 
@@ -79,7 +80,7 @@ const updateMasterDataById = async (req, res) => {
 //     const { type } = req.query;
 // 
 //     if (!type) {
-//         throw new ApiError(400, 'type is required to delete');
+//         throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'type is required to delete');
 //     }
 // 
 //     const existing = await masterDataService.getMasterDataById(id, type);
@@ -90,8 +91,8 @@ const updateMasterDataById = async (req, res) => {
 //         await clearMasterDataCacheForRecord({ type, parent_id: existing.parent_id || existing.state_id || existing.country_id });
 //     }
 // 
-//     return res.status(200).json(
-//         new ApiResponse(200, null, 'Master data deleted successfully')
+//     return res.status(HTTP_STATUS.OK).json(
+//         new ApiResponse(HTTP_STATUS.OK, null, 'Master data deleted successfully')
 //     );
 // };
 
