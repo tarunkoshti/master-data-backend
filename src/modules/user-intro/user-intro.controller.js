@@ -20,7 +20,7 @@ const uploadUserIntro = async (req, res) => {
 
     try {
         const duration = await getVideoDuration(video_file.path);
-        if (duration >= 30) {
+        if (duration >= 31) {
             await deleteFile(video_file.path);
             return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Video duration cannot exceed 30 seconds'));
         }
@@ -72,7 +72,7 @@ const updateUserIntro = async (req, res) => {
 
     try {
         const duration = await getVideoDuration(video_file.path);
-        if (duration >= 30) {
+        if (duration >= 31) {
             await deleteFile(video_file.path);
             return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Video duration cannot exceed 30 seconds'));
         }
