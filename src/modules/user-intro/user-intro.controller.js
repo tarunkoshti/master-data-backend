@@ -46,8 +46,8 @@ const getUserIntroByProfileId = async (req, res) => {
     const result = await userIntroService.getUserIntroByProfileId(profileId);
 
     if (!result) {
-        return res.status(304).json(
-            new ApiResponse(304, null, 'User intro not found')
+        return res.status(404).json(
+            new ApiResponse(404, null, 'User intro not found')
         );
     }
 
@@ -62,7 +62,7 @@ const updateUserIntro = async (req, res) => {
 
     const existingIntro = await userIntroService.getUserIntroById(id);
     if (!existingIntro) {
-        return res.status(304).json(new ApiResponse(304, null, 'User intro not found'));
+        return res.status(404).json(new ApiResponse(404, null, 'User intro not found'));
     }
 
     if (!video_file) {
@@ -104,7 +104,7 @@ const deleteUserIntro = async (req, res) => {
 
     const existingIntro = await userIntroService.getUserIntroById(id);
     if (!existingIntro) {
-        return res.status(304).json(new ApiResponse(304, null, 'User intro not found'));
+        return res.status(404).json(new ApiResponse(404, null, 'User intro not found'));
     }
 
     await userIntroService.deleteUserIntro(id);
