@@ -22,6 +22,15 @@ export const updateIntroSchema = z.object({
     })
 });
 
+export const updateStatusSchema = z.object({
+    body: z.object({
+        status: z.enum(['pending', 'approved', 'rejected']),
+    }),
+    params: z.object({
+        id: rowIdParam,
+    })
+});
+
 export const deleteIntroSchema = z.object({
     params: z.object({
         id: rowIdParam,

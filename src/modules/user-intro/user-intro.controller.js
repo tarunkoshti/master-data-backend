@@ -120,9 +120,46 @@ const deleteUserIntro = async (req, res) => {
     );
 };
 
+const updateUserIntroStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status, reason } = req.body;
+
+    const existingIntro = await userIntroService.getUserIntroById(id);
+    if (!existingIntro) {
+        return res.status(HTTP_STATUS.NOT_FOUND).json(new ApiResponse(HTTP_STATUS.NOT_FOUND, null, 'User intro not found'));
+    }
+
+    const result = await userIntroService.updateUserIntroStatus(id, { status, reason });
+
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'User intro status updated successfully')
+    );
+};
+
+const getAllUserIntros = async (req, res) => {
+    const page = parseInt(req.query.page) || undefined;
+    const limit = parseInt(req.query.limit) || undefined;
+
+    const query = {
+        pagination: page && limit ? { page, limit } : undefined,
+        sort: (req.query.sortBy || req.query.sortOrder) ? {
+            sortBy: req.query.sortBy,
+            sortOrder: req.query.sortOrder
+        } : undefined
+    };
+
+    const result = await userIntroService.getAllUserIntros({}, query);
+
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'User intros fetched successfully')
+    );
+};
+
 export const userIntroController = {
     uploadUserIntro,
     getUserIntroByProfileId,
     updateUserIntro,
     deleteUserIntro,
+    updateUserIntroStatus,
+    getAllUserIntros
 };

@@ -35,7 +35,18 @@ const migrate = async () => {
         //     );
         // `);
 
-        // Logger.info("Database migration completed.");
+        // await pool.query(`
+        //     ALTER TABLE user_intros
+        //     ADD COLUMN status ENUM(
+        //         'pending',
+        //         'approved',
+        //         'rejected'
+        //     )
+        //     NOT NULL DEFAULT 'pending',
+        //     ADD COLUMN reason TEXT DEFAULT NULL;
+        // `);
+
+        Logger.info("Database migration completed.");
 
         process.exit(0);
     } catch (error) {
