@@ -139,6 +139,7 @@ const updateUserIntroStatus = async (req, res) => {
 const getAllUserIntros = async (req, res) => {
     const page = parseInt(req.query.page) || undefined;
     const limit = parseInt(req.query.limit) || undefined;
+    const status = req.query.status;
 
     const query = {
         pagination: page && limit ? { page, limit } : undefined,
@@ -148,7 +149,11 @@ const getAllUserIntros = async (req, res) => {
         } : undefined
     };
 
-    const result = await userIntroService.getAllUserIntros({}, query);
+    const filters = {};
+    if (status) filters.status = status;
+    if (req.query.search) filters.search = req.query.search;
+
+    const result = await userIntroService.getAllUserIntros(filters, query);
 
     return res.status(HTTP_STATUS.OK).json(
         new ApiResponse(HTTP_STATUS.OK, result, 'User intros fetched successfully')

@@ -21,12 +21,6 @@ const deleteUserIntro = async (id) => {
 };
 
 const updateUserIntroStatus = async (id, { status, reason = null }) => {
-    // Check if user intro exists
-    const existingIntro = await userIntroRepository.getUserIntroById(id);
-    if (!existingIntro) {
-        throw new ApiError(HTTP_STATUS.NOT_FOUND, "User intro not found");
-    }
-
     const updatedUserIntro = await userIntroRepository.updateUserIntroStatus(id, { status, reason });
     return updatedUserIntro;
 };

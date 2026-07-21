@@ -46,6 +46,40 @@ const migrate = async () => {
         //     ADD COLUMN reason TEXT DEFAULT NULL;
         // `);
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS deletion_profile_reasons (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL
+            )
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS success_stories (
+                id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                profile_id INT UNSIGNED NOT NULL,
+                app_package_name VARCHAR(255) NOT NULL,
+                reason_id INT UNSIGNED NOT NULL,
+                marriage_photo VARCHAR(500) NOT NULL,
+                marriage_date DATE NOT NULL,
+                bride_name_address VARCHAR(500) NOT NULL,
+                groom_name_address VARCHAR(500) NOT NULL,
+                gift_delivery_address VARCHAR(1000) NOT NULL,
+                mobile_number VARCHAR(15) NOT NULL,
+                deleted_at TIMESTAMP NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                status ENUM(
+                    'pending',
+                    'verified',
+                    'rejected',
+                    'profile_deleted'
+                ) NOT NULL DEFAULT 'pending',
+
+                UNIQUE KEY uq_profile(profile_id),
+                CONSTRAINT fk_reason_id FOREIGN KEY (reason_id) REFERENCES deletion_profile_reasons(id) ON DELETE RESTRICT
+            )
+        `);
+
         Logger.info("Database migration completed.");
 
         process.exit(0);

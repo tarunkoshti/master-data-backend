@@ -56,15 +56,15 @@ export const ALLOWED_VIDEO_MIME_TYPES = [
 const UPLOADS_DIR = uploadDir;
 
 export const createImageUploader = (folderName = 'images') => createUploader({
-    maxSizeMB: 50,
-    maxFiles: 10,
+    maxSizeMB: 5,
+    maxFiles: 1,
     allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
     uploadPath: path.join(UPLOADS_DIR, folderName),
 });
 
 export const createDocumentUploader = (folderName = 'documents') => createUploader({
-    maxSizeMB: 50,
-    maxFiles: 5,
+    maxSizeMB: 5,
+    maxFiles: 1,
     allowedMimeTypes: ALLOWED_DOCUMENT_MIME_TYPES,
     uploadPath: path.join(UPLOADS_DIR, folderName),
 });

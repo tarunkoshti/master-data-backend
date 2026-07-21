@@ -76,13 +76,13 @@ const createMasterData = async (data) => {
             `INSERT INTO ${config.table} (name, ${config.parentCol}) VALUES (?, ?)`,
             [name, parent_id]
         );
-        return getMasterDataById(result.insertId, type);
+        return await getMasterDataById(result.insertId, type);
     } else {
         const [result] = await pool.query(
             `INSERT INTO ${config.table} (name) VALUES (?)`,
             [name]
         );
-        return getMasterDataById(result.insertId, type);
+        return await getMasterDataById(result.insertId, type);
     }
 };
 
@@ -103,7 +103,7 @@ const updateMasterDataById = async (id, data) => {
         );
     }
 
-    return getMasterDataById(id, type);
+    return await getMasterDataById(id, type);
 };
 
 // const deleteMasterDataById = async (id, type) => {
