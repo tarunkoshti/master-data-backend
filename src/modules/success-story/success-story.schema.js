@@ -10,13 +10,13 @@ export const submitSuccessStorySchema = z.object({
         profile_id: z.preprocess((val) => Number(val), z.number().int().positive('Profile ID is required')),
         app_package_name: z.string().min(1, 'App Package Name is required'),
         reason_id: z.preprocess((val) => Number(val), z.number().int().positive('Reason ID is required')),
+        mobile_number: z.string().min(10, 'Mobile number must be at least 10 digits'),
         marriage_date: z.string().refine((val) => new Date(val).getTime() <= new Date().getTime(), {
             message: 'Marriage date cannot be a future date'
-        }).transform((val) => DateUtil.toDateOnly(val)),
-        bride_name_address: z.string().min(1, 'Bride name & address is required'),
-        groom_name_address: z.string().min(1, 'Groom name & address is required'),
-        gift_delivery_address: z.string().min(1, 'Gift delivery address is required'),
-        mobile_number: z.string().min(10, 'Mobile number must be at least 10 digits'),
+        }).transform((val) => DateUtil.toDateOnly(val)).optional(),
+        bride_name_address: z.string().optional(),
+        groom_name_address: z.string().optional(),
+        gift_delivery_address: z.string().optional(),
     })
 });
 

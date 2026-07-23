@@ -1,4 +1,5 @@
 import { successStoryService } from './success-story.service.js';
+import { successStoryExportService } from './success-story.export.service.js';
 import { ApiResponse } from '../../core/utils/ApiResponse.js';
 import { HTTP_STATUS } from '../../core/constants/http-status-codes.constant.js';
 import { generateFileUrl } from '../../core/utils/fileUtils.js';
@@ -22,11 +23,10 @@ const submitSuccessStory = async (req, res) => {
         return res.status(HTTP_STATUS.CONFLICT).json(new ApiResponse(HTTP_STATUS.CONFLICT, null, 'Success story already exists for this profile.'));
     }
 
-    if (!req.file) {
-        return res.status(HTTP_STATUS.BAD_REQUEST).json(new ApiResponse(HTTP_STATUS.BAD_REQUEST, null, 'Marriage photo not uploaded.'));
+    let marriage_photo = null;
+    if (req.file) {
+        marriage_photo = generateFileUrl(req, SUCCESS_STORY_IMAGE_FOLDER, req.file.filename);
     }
-
-    let marriage_photo = generateFileUrl(req, SUCCESS_STORY_IMAGE_FOLDER, req.file.filename);
 
     const result = await successStoryService.submitSuccessStory({
         profile_id,
@@ -101,9 +101,34 @@ const updateSuccessStoryStatus = async (req, res) => {
     );
 };
 
+const exportSuccessStories = async (req, res) => {
+    const status = req.query.status;
+
+    const query = {
+        sort: (req.query.sortBy || req.query.sortOrder) ? {
+            sortBy: req.query.sortBy,
+            sortOrder: req.query.sortOrder
+        } : undefined
+    };
+
+    const filters = {};
+    if (status) filters.status = status;
+    if (req.query.search) filters.search = req.query.search;
+
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `success-stories-${status || 'all'}-${dateStr}.xlsx`;
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+
+    await successStoryExportService.exportSuccessStories(filters, query, res);
+};
+
 export const successStoryController = {
     submitSuccessStory,
     getAllSuccessStories,
     getSuccessStoryByProfileId,
-    updateSuccessStoryStatus
+    updateSuccessStoryStatus,
+    exportSuccessStories
 };

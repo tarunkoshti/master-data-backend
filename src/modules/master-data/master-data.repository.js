@@ -29,6 +29,7 @@ const TABLE_MAP = {
     'annual_incomes': { table: 'annual_incomes', parentCol: null },
     'house': { table: 'house', parentCol: null },
     'car': { table: 'car', parentCol: null },
+    'deletion_profile_reasons': { table: 'deletion_profile_reasons', parentCol: null },
 };
 
 const getMasterDataById = async (id, type) => {

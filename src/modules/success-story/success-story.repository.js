@@ -86,7 +86,7 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
     let dataQuery = `
         SELECT ss.*, dpr.name AS deletion_reason 
         FROM ${TABLES.SUCCESS_STORIES} ss 
-        LEFT JOIN deletion_profile_reasons dpr ON ss.reason_id = dpr.id 
+        LEFT JOIN ${TABLES.DELETION_PROFILE_REASONS} dpr ON ss.reason_id = dpr.id 
         ${whereClause} 
         ORDER BY ss.${sortBy} ${orderStr}
     `;

@@ -13,6 +13,7 @@ const imageUpload = createImageUploader(SUCCESS_STORY_IMAGE_FOLDER);
 
 router.post('/', imageUpload.single('marriage_photo'), validate(submitSuccessStorySchema), asyncHandler(successStoryController.submitSuccessStory));
 router.get('/', authHandler, asyncHandler(successStoryController.getAllSuccessStories));
+router.get('/export', authHandler, asyncHandler(successStoryController.exportSuccessStories));
 router.get('/:profileId', authHandler, validate(getSuccessStorySchema), asyncHandler(successStoryController.getSuccessStoryByProfileId));
 router.patch('/status/:id', authHandler, validate(updateSuccessStoryStatusSchema), asyncHandler(successStoryController.updateSuccessStoryStatus));
 
