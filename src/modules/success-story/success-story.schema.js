@@ -13,7 +13,7 @@ export const submitSuccessStorySchema = z.object({
         mobile_number: z.string().min(10, 'Mobile number must be at least 10 digits'),
         marriage_date: z.string().refine((val) => new Date(val).getTime() <= new Date().getTime(), {
             message: 'Marriage date cannot be a future date'
-        }).transform((val) => DateUtil.toDateOnly(val)).optional(),
+        }).optional(),
         bride_name_address: z.string().optional(),
         groom_name_address: z.string().optional(),
         gift_delivery_address: z.string().optional(),

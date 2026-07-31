@@ -48,7 +48,7 @@ const submitSuccessStory = async (req, res) => {
 const getAllSuccessStories = async (req, res) => {
     const page = parseInt(req.query.page) || undefined;
     const limit = parseInt(req.query.limit) || undefined;
-    const status = req.query.status;
+    const { status, app_package_name } = req.query;
 
     const query = {
         pagination: page && limit ? { page, limit } : undefined,
@@ -59,6 +59,7 @@ const getAllSuccessStories = async (req, res) => {
     };
 
     const filters = {};
+    if (app_package_name) filters.app_package_name = app_package_name;
     if (status) filters.status = status;
     if (req.query.search) filters.search = req.query.search;
 

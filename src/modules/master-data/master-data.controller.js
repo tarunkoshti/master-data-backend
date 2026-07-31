@@ -46,6 +46,21 @@ const getAllMasterData = async (req, res) => {
     );
 };
 
+const getBatchMasterData = async (req, res) => {
+    const { types } = req.body;
+
+    if (!Array.isArray(types) || types.length === 0) {
+        throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'types array is required and cannot be empty');
+    }
+
+    // You can optionally add caching here, similar to getAllMasterData
+    const result = await masterDataService.getBatchMasterData({ types });
+
+    return res.status(HTTP_STATUS.OK).json(
+        new ApiResponse(HTTP_STATUS.OK, result, 'Batch Master data fetched successfully')
+    );
+};
+
 const createMasterData = async (req, res) => {
     const { type, name, parent_id } = req.body;
     const result = await masterDataService.createMasterData({ type, name, parent_id });
@@ -99,6 +114,7 @@ const updateMasterDataById = async (req, res) => {
 
 export const masterDataController = {
     getAllMasterData,
+    getBatchMasterData,
     createMasterData,
     updateMasterDataById,
     // deleteMasterDataById,

@@ -31,6 +31,12 @@ export const getAllSchema = z.object({
     }),
 });
 
+export const getBatchSchema = z.object({
+    body: z.object({
+        types: z.array(z.string()).min(1, "At least one type must be provided")
+    }),
+});
+
 export const createSchema = z.object({
     body: masterDataBodySchema
 });

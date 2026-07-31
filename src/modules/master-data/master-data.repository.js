@@ -3,6 +3,7 @@ import pool from '../../config/db.js';
 const TABLE_MAP = {
     'zodiacs': { table: 'zodiacs', parentCol: null },
     'subcastes': { table: 'subcastes', parentCol: 'community_id' },
+    'sampradayas': { table: 'sampradayas', parentCol: null },
     'states': { table: 'states', parentCol: 'country_id' },
     'relations': { table: 'relations', parentCol: null },
     'family_status': { table: 'family_status', parentCol: null },

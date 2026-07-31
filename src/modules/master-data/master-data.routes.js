@@ -5,6 +5,7 @@ import { authHandler } from '../../core/middlewares/authenticate.js';
 import { validate } from '../../core/middlewares/validate.js';
 import {
     getAllSchema,
+    getBatchSchema,
     createSchema,
     updateSchema,
     deleteSchema
@@ -15,6 +16,7 @@ const router = express.Router();
 router.use(authHandler);
 
 router.get('/', validate(getAllSchema), asyncHandler(masterDataController.getAllMasterData));
+router.post('/batch', validate(getBatchSchema), asyncHandler(masterDataController.getBatchMasterData));
 router.post('/', validate(createSchema), asyncHandler(masterDataController.createMasterData));
 router.put('/:id', validate(updateSchema), asyncHandler(masterDataController.updateMasterDataById));
 // router.delete('/:id', validate(deleteSchema), asyncHandler(masterDataController.deleteMasterDataById));

@@ -62,6 +62,11 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
     const queryParams = [];
     const conditions = [];
 
+    if (filters?.app_package_name) {
+        conditions.push('ss.app_package_name = ?');
+        queryParams.push(filters.app_package_name);
+    }
+
     if (filters.status) {
         conditions.push('ss.status = ?');
         queryParams.push(filters.status);
