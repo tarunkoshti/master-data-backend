@@ -46,12 +46,12 @@ const submitSuccessStory = async (req, res) => {
 };
 
 const getAllSuccessStories = async (req, res) => {
-    const page = parseInt(req.query.page) || undefined;
-    const limit = parseInt(req.query.limit) || undefined;
+    const limit = 20;
+    const last_id = req.query.last_id !== undefined ? parseInt(req.query.last_id) : undefined;
     const { status, app_package_name } = req.query;
 
     const query = {
-        pagination: page && limit ? { page, limit } : undefined,
+        pagination: req.query.last_id !== undefined ? { limit, last_id } : undefined,
         sort: (req.query.sortBy || req.query.sortOrder) ? {
             sortBy: req.query.sortBy,
             sortOrder: req.query.sortOrder

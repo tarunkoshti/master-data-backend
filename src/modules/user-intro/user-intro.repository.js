@@ -97,14 +97,39 @@ const getAllUserIntros = async (filter = {}, query = {}) => {
 
 
     // Get paginated data
-    let dataQuery = `SELECT * FROM ${TABLES.USER_INTROS} ${whereClause} ORDER BY ${sortBy} ${orderStr}`;
+    let dataQuery = `SELECT * FROM ${TABLES.USER_INTROS} ${whereClause}`;
 
     if (query?.pagination) {
-        const { page, limit } = query.pagination;
-        const offset = (page - 1) * limit;
+        const { limit, last_id } = query.pagination;
+        
+        let cursorWhereClause = whereClause;
+        const paginationParams = [...queryParams];
+        let page = 1;
 
-        dataQuery += ' LIMIT ? OFFSET ?';
-        const paginationParams = [...queryParams, limit, offset];
+        if (last_id) {
+            const operator = orderStr === 'ASC' ? '>' : '<';
+            const cursorCondition = `id ${operator} ?`;
+            if (conditions.length > 0) {
+                cursorWhereClause = `WHERE ${conditions.join(' AND ')} AND ${cursorCondition}`;
+            } else {
+                cursorWhereClause = `WHERE ${cursorCondition}`;
+            }
+            paginationParams.push(last_id);
+
+            const countOperator = orderStr === 'ASC' ? '<=' : '>=';
+            const countBeforeCondition = `id ${countOperator} ?`;
+            const countBeforeWhereClause = conditions.length > 0 
+                ? `WHERE ${conditions.join(' AND ')} AND ${countBeforeCondition}`
+                : `WHERE ${countBeforeCondition}`;
+                
+            const countBeforeQuery = `SELECT COUNT(*) as count FROM ${TABLES.USER_INTROS} ${countBeforeWhereClause}`;
+            const [countBeforeRows] = await pool.query(countBeforeQuery, [...queryParams, last_id]);
+            const itemsBefore = countBeforeRows[0].count;
+            page = Math.floor(itemsBefore / limit) + 1;
+        }
+
+        dataQuery = `SELECT * FROM ${TABLES.USER_INTROS} ${cursorWhereClause} ORDER BY ${sortBy} ${orderStr} LIMIT ?`;
+        paginationParams.push(limit);
 
         const [rows] = await pool.query(dataQuery, paginationParams);
 
@@ -122,6 +147,7 @@ const getAllUserIntros = async (filter = {}, query = {}) => {
         };
     } else {
 
+        dataQuery = `SELECT * FROM ${TABLES.USER_INTROS} ${whereClause} ORDER BY ${sortBy} ${orderStr}`;
         const [rows] = await pool.query(dataQuery, queryParams);
 
         return {

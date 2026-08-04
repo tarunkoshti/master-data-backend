@@ -88,20 +88,45 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
     const totalDocuments = countRows[0].total;
 
     // Get paginated data
-    let dataQuery = `
+    let baseSelect = `
         SELECT ss.*, dpr.name AS deletion_reason 
         FROM ${TABLES.SUCCESS_STORIES} ss 
-        LEFT JOIN ${TABLES.DELETION_PROFILE_REASONS} dpr ON ss.reason_id = dpr.id 
-        ${whereClause} 
-        ORDER BY ss.${sortBy} ${orderStr}
+        LEFT JOIN ${TABLES.DELETION_PROFILE_REASONS} dpr ON ss.reason_id = dpr.id
     `;
+    
+    let dataQuery = `${baseSelect} ${whereClause}`;
 
     if (query?.pagination) {
-        const { page, limit } = query.pagination;
-        const offset = (page - 1) * limit;
+        const { limit, last_id } = query.pagination;
 
-        dataQuery += ' LIMIT ? OFFSET ?';
-        const paginationParams = [...queryParams, limit, offset];
+        let cursorWhereClause = whereClause;
+        const paginationParams = [...queryParams];
+        let page = 1;
+
+        if (last_id) {
+            const operator = orderStr === 'ASC' ? '>' : '<';
+            const cursorCondition = `ss.id ${operator} ?`;
+            if (conditions.length > 0) {
+                cursorWhereClause = `WHERE ${conditions.join(' AND ')} AND ${cursorCondition}`;
+            } else {
+                cursorWhereClause = `WHERE ${cursorCondition}`;
+            }
+            paginationParams.push(last_id);
+
+            const countOperator = orderStr === 'ASC' ? '<=' : '>=';
+            const countBeforeCondition = `ss.id ${countOperator} ?`;
+            const countBeforeWhereClause = conditions.length > 0 
+                ? `WHERE ${conditions.join(' AND ')} AND ${countBeforeCondition}`
+                : `WHERE ${countBeforeCondition}`;
+                
+            const countBeforeQuery = `SELECT COUNT(*) as count FROM ${TABLES.SUCCESS_STORIES} ss ${countBeforeWhereClause}`;
+            const [countBeforeRows] = await pool.query(countBeforeQuery, [...queryParams, last_id]);
+            const itemsBefore = countBeforeRows[0].count;
+            page = Math.floor(itemsBefore / limit) + 1;
+        }
+
+        dataQuery = `${baseSelect} ${cursorWhereClause} ORDER BY ss.${sortBy} ${orderStr} LIMIT ?`;
+        paginationParams.push(limit);
 
         const [rows] = await pool.query(dataQuery, paginationParams);
 
@@ -119,6 +144,7 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
         };
     } else {
 
+        dataQuery = `${baseSelect} ${whereClause} ORDER BY ss.${sortBy} ${orderStr}`;
         const [rows] = await pool.query(dataQuery, queryParams);
 
         return {
