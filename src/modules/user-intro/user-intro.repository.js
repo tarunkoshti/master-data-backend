@@ -1,4 +1,4 @@
-import pool from '../../config/db.js';
+import { pool } from '../../config/db.js';
 import { TABLES } from '../../core/constants/table.constant.js';
 import { USER_INTRO_SORT_FIELD, USER_INTRO_STATUS } from './user-intro.constant.js';
 

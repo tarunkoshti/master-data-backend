@@ -1,4 +1,4 @@
-import pool from "../../config/db.js";
+import { pool } from "../../config/db.js";
 import { TABLES } from "../../core/constants/table.constant.js";
 import { SUCCESS_STORY_SORT_FIELD, SUCCESS_STORY_STATUS } from "./success-story.constant.js";
 

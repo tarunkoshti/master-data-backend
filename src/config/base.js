@@ -15,6 +15,10 @@ export const db = {
   host: process.env.DB_HOST || '',
   user: process.env.DB_USER || '',
   password: process.env.DB_PASSWORD || '',
+
+  name1: process.env.DB_NAME_1 || '',
+  user1: process.env.DB_USER_1 || '',
+  password1: process.env.DB_PASSWORD_1 || '',
 };
 
 export const redisConfig = {

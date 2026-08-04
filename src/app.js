@@ -4,15 +4,18 @@ import cookieParser from 'cookie-parser';
 import { errorHandler } from './core/middlewares/errorHandler.js';
 import Logger from './core/utils/logger.js';
 import apiRoutes from './core/routes/index.js';
-import pool from './config/db.js';
+import { pool, pool1 } from './config/db.js';
 import { frontendUrl, uploadDir } from './config/base.js';
 
 // Verify database connection
 const connectDb = async () => {
     try {
         const connection = await pool.getConnection();
-        Logger.info("Database connected successfully");
+        const connection1 = await pool1.getConnection();
+        Logger.info("(Master DB) : Database connected successfully");
+        Logger.info("(Rishtey Community Apps) : Database connected successfully");
         connection.release();
+        connection1.release()
     } catch (err) {
         Logger.error("Database connection failed: " + err.message);
     }

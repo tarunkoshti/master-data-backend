@@ -1,4 +1,4 @@
-import pool from '../../config/db.js';
+import { pool } from '../../config/db.js';
 import { TABLES } from '../../core/constants/table.constant.js';
 
 const findByEmail = async (email) => {

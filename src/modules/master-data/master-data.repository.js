@@ -1,4 +1,4 @@
-import pool from '../../config/db.js';
+import { pool } from '../../config/db.js';
 
 const TABLE_MAP = {
     'zodiacs': { table: 'zodiacs', parentCol: null },

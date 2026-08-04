@@ -1,4 +1,4 @@
-import pool from "../../config/db.js";
+import { pool } from "../../config/db.js";
 import Logger from "../utils/logger.js";
 
 const migrate = async () => {
