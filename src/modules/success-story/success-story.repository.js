@@ -72,6 +72,11 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
         queryParams.push(filters.status);
     }
 
+    if (filters.reason_id) {
+        conditions.push('ss.reason_id = ?');
+        queryParams.push(filters.reason_id);
+    }
+
     if (filters.search) {
         conditions.push('(ss.app_package_name LIKE ? OR ss.profile_id LIKE ? OR ss.mobile_number LIKE ?)');
         const searchPattern = `%${filters.search}%`;
@@ -93,7 +98,7 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
         FROM ${TABLES.SUCCESS_STORIES} ss 
         LEFT JOIN ${TABLES.DELETION_PROFILE_REASONS} dpr ON ss.reason_id = dpr.id
     `;
-    
+
     let dataQuery = `${baseSelect} ${whereClause}`;
 
     if (query?.pagination) {
@@ -115,10 +120,10 @@ const getAllSuccessStories = async (filters = {}, query = {}) => {
 
             const countOperator = orderStr === 'ASC' ? '<=' : '>=';
             const countBeforeCondition = `ss.id ${countOperator} ?`;
-            const countBeforeWhereClause = conditions.length > 0 
+            const countBeforeWhereClause = conditions.length > 0
                 ? `WHERE ${conditions.join(' AND ')} AND ${countBeforeCondition}`
                 : `WHERE ${countBeforeCondition}`;
-                
+
             const countBeforeQuery = `SELECT COUNT(*) as count FROM ${TABLES.SUCCESS_STORIES} ss ${countBeforeWhereClause}`;
             const [countBeforeRows] = await pool.query(countBeforeQuery, [...queryParams, last_id]);
             const itemsBefore = countBeforeRows[0].count;

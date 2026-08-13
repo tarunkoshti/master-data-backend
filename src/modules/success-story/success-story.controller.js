@@ -48,7 +48,7 @@ const submitSuccessStory = async (req, res) => {
 const getAllSuccessStories = async (req, res) => {
     const limit = 20;
     const last_id = req.query.last_id !== undefined ? parseInt(req.query.last_id) : undefined;
-    const { status, app_package_name } = req.query;
+    const { status, app_package_name, reason_id } = req.query;
 
     const query = {
         pagination: req.query.last_id !== undefined ? { limit, last_id } : undefined,
@@ -61,6 +61,7 @@ const getAllSuccessStories = async (req, res) => {
     const filters = {};
     if (app_package_name) filters.app_package_name = app_package_name;
     if (status) filters.status = status;
+    if (reason_id) filters.reason_id = reason_id;
     if (req.query.search) filters.search = req.query.search;
 
     const result = await successStoryService.getAllSuccessStories(filters, query);
@@ -104,6 +105,7 @@ const updateSuccessStoryStatus = async (req, res) => {
 
 const exportSuccessStories = async (req, res) => {
     const status = req.query.status;
+    const reason_id = req.query.reason_id;
 
     const query = {
         sort: (req.query.sortBy || req.query.sortOrder) ? {
@@ -114,6 +116,7 @@ const exportSuccessStories = async (req, res) => {
 
     const filters = {};
     if (status) filters.status = status;
+    if (reason_id) filters.reason_id = reason_id;
     if (req.query.search) filters.search = req.query.search;
 
     const dateStr = new Date().toISOString().split('T')[0];
