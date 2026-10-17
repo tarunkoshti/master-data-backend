@@ -6,6 +6,7 @@ export const environment = process.env.NODE_ENV;
 export const port = process.env.PORT;
 export const frontendUrl = process.env.FRONTEND_URL;
 export const jwtSecret = process.env.JWT_SECRET;
+export const resetTokenSecret = process.env.RESET_TOKEN_SECRET;
 export const apiKey = process.env.API_KEY;
 export const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads');;
 
@@ -26,3 +27,11 @@ export const redisConfig = {
   port: process.env.REDIS_PORT || '',
   isRedisEnabled: process.env.IS_REDIS_ENABLED === 'true',
 };
+
+export const smtpConfig = {
+  host: process.env.MAIL_HOST,
+  port: process.env.MAIL_PORT,
+  secure: process.env.MAIL_SECURE === "true",
+  authUser: process.env.MAIL_USER,
+  authPassword: process.env.MAIL_PASSWORD
+}

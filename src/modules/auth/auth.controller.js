@@ -51,10 +51,33 @@ const changePassword = async (req, res) => {
   );
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  await authService.forgotPassword({ email });
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(HTTP_STATUS.OK, null, 'Password reset link sent to your registered email')
+  );
+};
+
+const resetPassword = async (req, res) => {
+
+  const { token, newPassword } = req.body;
+
+  await authService.resetPassword({ token, newPassword });
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(HTTP_STATUS.OK, null, 'Password reset successfully')
+  );
+};
+
 export const authController = {
   register,
   login,
   logout,
   me,
   changePassword,
+  forgotPassword,
+  resetPassword,
 };

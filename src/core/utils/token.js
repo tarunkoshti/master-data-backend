@@ -1,9 +1,30 @@
 import jwt from 'jsonwebtoken';
-import { jwtSecret } from '../../config/base.js';
+import { jwtSecret, resetTokenSecret } from '../../config/base.js';
 
 export const generateToken = (payload) => {
   return jwt.sign(payload, jwtSecret, { expiresIn: '1d' });
 };
+
+export const generateResetToken = (payload, password) => {
+  const secret = resetTokenSecret + password;
+  return jwt.sign(payload, secret, { expiresIn: '1h' });
+}
+
+export const verifyResetToken = (token, password) => {
+  try {
+    const secret = resetTokenSecret + password;
+    return jwt.verify(token, secret);
+  } catch (err) {
+    if (err.name === "TokenExpiredError") throw new ApiError(401, "Invalid or expired reset token");
+    throw new ApiError(401, "Invalid or expired reset token");
+  }
+}
+
+export const decodeToken = (token) => {
+  const decoded = jwt.decode(token);
+  if (!decoded || typeof decoded === 'string') return null;
+  return decoded;
+}
 
 export const verifyToken = (token) => {
   try {
