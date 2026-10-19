@@ -4,7 +4,7 @@ export const TABLES = {
     SUCCESS_STORIES: 'success_stories',
     DELETION_PROFILE_REASONS: 'deletion_profile_reasons',
     KUNDALI: 'kundali',
-    KUNDALI_MILAN: 'kundali_milan',
+    KUNDALI_COMPATIBILITY: 'kundali_compatibility',
 
     // rishtey community apps
     UNREGISTERED_USERS: 'unregistered_users',

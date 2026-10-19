@@ -1,15 +1,17 @@
 import { kundaliRepository } from './kundali.repository.js';
-import { navGenerateBasicKundali, navGenerateCompleteKundali } from '../../clients/navamsha.client.js';
+import { generateBasicKundali, generateCompleteKundali } from '../../clients/navamsha.client.js';
 import { ApiError } from '../../core/utils/ApiError.js';
 import { HTTP_STATUS } from '../../core/constants/http-status-codes.constant.js';
+import { KUNDALI_DEFAULT_SETTINGS, KUNDALI_TYPE } from './kundali.constant.js';
 
-const getKundali = async ({ profile_id, type }) => {
-    const result = await kundaliRepository.getKundali({ profile_id, type });
+const getKundali = async ({ profile_id, app_package_name, type }) => {
+    const result = await kundaliRepository.getKundali({ profile_id, app_package_name, type });
     if (!result) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Kundali not found');
-    return JSON.parse(result?.res_json);
+    result.res_json = JSON.parse(result?.res_json);
+    return result;
 };
 
-const generateBasicKundali = async (data) => {
+const generateAndSaveBasicKundali = async (data) => {
     const {
         profile_id,
         app_package_name,
@@ -26,12 +28,12 @@ const generateBasicKundali = async (data) => {
     } = data;
 
     const finalSettings = {
-        ayanamsha: settings?.ayanamsha || "lahiri",
-        language: settings?.language || "en",
-        observation_point: settings?.observation_point || "topocentric",
+        ayanamsha: settings?.ayanamsha || KUNDALI_DEFAULT_SETTINGS.ayanamsha,
+        language: settings?.language || KUNDALI_DEFAULT_SETTINGS.language,
+        observation_point: settings?.observation_point || KUNDALI_DEFAULT_SETTINGS.observation_point,
     };
 
-    const { output } = await navGenerateBasicKundali({
+    const { output } = await generateBasicKundali({
         date,
         month,
         year,
@@ -44,14 +46,28 @@ const generateBasicKundali = async (data) => {
         settings: finalSettings
     });
 
-    return kundaliRepository.addBasicKundali({
+    const existingBasicKundali = await kundaliRepository.getKundali({
         profile_id,
         app_package_name,
-        res_json: JSON.stringify(output)
+        type: KUNDALI_TYPE.BASIC
     });
+
+    if (existingBasicKundali) {
+        return await kundaliRepository.updateBasicKundali({
+            profile_id,
+            app_package_name,
+            res_json: JSON.stringify(output)
+        });
+    } else {
+        return kundaliRepository.saveBasicKundali({
+            profile_id,
+            app_package_name,
+            res_json: JSON.stringify(output)
+        });
+    }
 };
 
-const generateCompleteKundali = async (data) => {
+const generateAndSaveCompleteKundali = async (data) => {
     const {
         profile_id,
         app_package_name,
@@ -68,12 +84,12 @@ const generateCompleteKundali = async (data) => {
     } = data;
 
     const finalSettings = {
-        ayanamsha: settings?.ayanamsha || "lahiri",
-        language: settings?.language || "en",
-        observation_point: settings?.observation_point || "topocentric",
+        ayanamsha: settings?.ayanamsha || KUNDALI_DEFAULT_SETTINGS.ayanamsha,
+        language: settings?.language || KUNDALI_DEFAULT_SETTINGS.language,
+        observation_point: settings?.observation_point || KUNDALI_DEFAULT_SETTINGS.observation_point,
     };
 
-    const { output } = await navGenerateCompleteKundali({
+    const { output } = await generateCompleteKundali({
         date,
         month,
         year,
@@ -86,15 +102,29 @@ const generateCompleteKundali = async (data) => {
         settings: finalSettings
     });
 
-    return kundaliRepository.addCompleteKundali({
+    const existingBasicKundali = await kundaliRepository.getKundali({
         profile_id,
         app_package_name,
-        res_json: JSON.stringify(output)
+        type: KUNDALI_TYPE.COMPLETE
     });
+
+    if (existingBasicKundali) {
+        return await kundaliRepository.updateCompleteKundali({
+            profile_id,
+            app_package_name,
+            res_json: JSON.stringify(output)
+        });
+    } else {
+        return kundaliRepository.saveCompleteKundali({
+            profile_id,
+            app_package_name,
+            res_json: JSON.stringify(output)
+        });
+    }
 };
 
 export const kundaliService = {
-    generateBasicKundali,
-    generateCompleteKundali,
+    generateAndSaveBasicKundali,
+    generateAndSaveCompleteKundali,
     getKundali
 };

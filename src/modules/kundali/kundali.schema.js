@@ -3,7 +3,7 @@ import { z } from 'zod';
 const idParam = z.preprocess((val) => Number(val), z.number().positive('Valid Profile ID is required'));
 const rowIdParam = z.preprocess((val) => Number(val), z.number().positive('Valid ID is required'));
 
-export const createKundaliSchema = z.object({
+export const generateKundaliSchema = z.object({
     body: z.object({
         profile_id: idParam,
         app_package_name: z.string().min(1, 'App Package Name is required'),

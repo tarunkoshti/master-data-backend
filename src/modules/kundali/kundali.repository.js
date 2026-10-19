@@ -2,15 +2,15 @@ import { pool } from '../../config/db.js';
 import { TABLES } from '../../core/constants/table.constant.js';
 import { KUNDALI_TYPE } from './kundali.constant.js';
 
-const getKundali = async ({ profile_id, type }) => {
+const getKundali = async ({ profile_id, app_package_name, type }) => {
     const [result] = await pool.query(`
-            SELECT * FROM ${TABLES.KUNDALI} WHERE profile_id = ? AND kundali_type = ?
+            SELECT * FROM ${TABLES.KUNDALI} WHERE profile_id = ? AND app_package_name = ? AND kundali_type = ?
         `,
-        [profile_id, type]);
+        [profile_id, app_package_name, type]);
     return result[0];
 };
 
-const addBasicKundali = async ({
+const saveBasicKundali = async ({
     profile_id,
     app_package_name,
     res_json
@@ -34,7 +34,26 @@ const addBasicKundali = async ({
     return result.insertId;
 };
 
-const addCompleteKundali = async ({
+const updateBasicKundali = async ({
+    profile_id,
+    app_package_name,
+    res_json
+}) => {
+    const [result] = await pool.query(`
+            UPDATE ${TABLES.KUNDALI} SET
+                res_json = ?
+            WHERE profile_id = ? AND app_package_name = ? AND kundali_type = ?
+        `,
+        [
+            res_json,
+            profile_id,
+            app_package_name,
+            KUNDALI_TYPE.BASIC
+        ]);
+    return result.affectedRows;
+};
+
+const saveCompleteKundali = async ({
     profile_id,
     app_package_name,
     res_json
@@ -57,8 +76,29 @@ const addCompleteKundali = async ({
     return result.insertId;
 };
 
+const updateCompleteKundali = async ({
+    profile_id,
+    app_package_name,
+    res_json
+}) => {
+    const [result] = await pool.query(`
+            UPDATE ${TABLES.KUNDALI} SET
+                res_json = ?
+            WHERE profile_id = ? AND app_package_name = ? AND kundali_type = ?
+        `,
+        [
+            res_json,
+            profile_id,
+            app_package_name,
+            KUNDALI_TYPE.COMPLETE
+        ]);
+    return result.affectedRows;
+};
+
 export const kundaliRepository = {
-    addBasicKundali,
-    addCompleteKundali,
-    getKundali
+    getKundali,
+    saveBasicKundali,
+    updateBasicKundali,
+    saveCompleteKundali,
+    updateCompleteKundali
 };
