@@ -26,3 +26,8 @@ export const redisConfig = {
   port: process.env.REDIS_PORT || '',
   isRedisEnabled: process.env.IS_REDIS_ENABLED === 'true',
 };
+
+export const navamshaConfig = {
+  apiKey: process.env.NAVAMSHA_API_KEY,
+  apiUrl: process.env.NAVAMSHA_API_URL
+}

@@ -1,0 +1,4 @@
+export const KUNDALI_TYPE = {
+    BASIC: 'BASIC_KUNDALI',
+    COMPLETE: 'COMPLETE_KUNDALI',
+};
