@@ -68,10 +68,24 @@ const compareManglikCompatibility = async (body) => {
     }
 };
 
+const checkMangalDosha = async (body) => {
+    try {
+        const response = await axios.post(`${apiUrl}/dosha/mangal`, body, {
+            headers: {
+                "X-API-KEY": apiKey
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export {
     generateBasicKundali,
     generateCompleteKundali,
     compareAshtakootCompatibility,
     compareDetailedAshtakootCompatibility,
-    compareManglikCompatibility
+    compareManglikCompatibility,
+    checkMangalDosha
 }

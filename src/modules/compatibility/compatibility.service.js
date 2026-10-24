@@ -38,7 +38,6 @@ const calculateAshtakootCompatibility = async (data) => {
             settings: bride_finalSettings
         },
         groom: {
-            name: groom.name,
             date: groom.date,
             month: groom.month,
             year: groom.year,
@@ -87,7 +86,6 @@ const calculateDetailedAshtakootCompatibility = async (data) => {
             settings: bride_finalSettings
         },
         groom: {
-            name: groom.name,
             date: groom.date,
             month: groom.month,
             year: groom.year,

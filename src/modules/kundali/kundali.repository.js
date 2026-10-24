@@ -13,7 +13,8 @@ const getKundali = async ({ profile_id, app_package_name, type }) => {
 const saveBasicKundali = async ({
     profile_id,
     app_package_name,
-    res_json
+    res_json,
+    res_json_mangal_dosha
 }) => {
 
     const [result] = await pool.query(`
@@ -21,15 +22,17 @@ const saveBasicKundali = async ({
                 profile_id,
                 app_package_name,
                 kundali_type,
-                res_json  
+                res_json,
+                res_json_mangal_dosha  
             )
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
         `,
         [
             profile_id,
             app_package_name,
             KUNDALI_TYPE.BASIC,
-            res_json
+            res_json,
+            res_json_mangal_dosha
         ]);
     return result.insertId;
 };
@@ -37,15 +40,18 @@ const saveBasicKundali = async ({
 const updateBasicKundali = async ({
     profile_id,
     app_package_name,
-    res_json
+    res_json,
+    res_json_mangal_dosha
 }) => {
     const [result] = await pool.query(`
             UPDATE ${TABLES.KUNDALI} SET
-                res_json = ?
+                res_json = ?,
+                res_json_mangal_dosha = ?
             WHERE profile_id = ? AND app_package_name = ? AND kundali_type = ?
         `,
         [
             res_json,
+            res_json_mangal_dosha,
             profile_id,
             app_package_name,
             KUNDALI_TYPE.BASIC
@@ -56,22 +62,25 @@ const updateBasicKundali = async ({
 const saveCompleteKundali = async ({
     profile_id,
     app_package_name,
-    res_json
+    res_json,
+    res_json_mangal_dosha
 }) => {
     const [result] = await pool.query(`
             INSERT INTO ${TABLES.KUNDALI} (
                 profile_id,
                 app_package_name,
                 kundali_type,
-                res_json
+                res_json,
+                res_json_mangal_dosha
             )
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
         `,
         [
             profile_id,
             app_package_name,
             KUNDALI_TYPE.COMPLETE,
-            res_json
+            res_json,
+            res_json_mangal_dosha
         ]);
     return result.insertId;
 };
@@ -79,15 +88,18 @@ const saveCompleteKundali = async ({
 const updateCompleteKundali = async ({
     profile_id,
     app_package_name,
-    res_json
+    res_json,
+    res_json_mangal_dosha
 }) => {
     const [result] = await pool.query(`
             UPDATE ${TABLES.KUNDALI} SET
-                res_json = ?
+                res_json = ?,
+                res_json_mangal_dosha = ?
             WHERE profile_id = ? AND app_package_name = ? AND kundali_type = ?
         `,
         [
             res_json,
+            res_json_mangal_dosha,
             profile_id,
             app_package_name,
             KUNDALI_TYPE.COMPLETE
