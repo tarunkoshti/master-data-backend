@@ -3,18 +3,18 @@ import { navamshaConfig } from "../config/base.js";
 
 const { apiKey, apiUrl } = navamshaConfig;
 
-const generateBasicKundali = async (body) => {
-    try {
-        const response = await axios.post(`${apiUrl}/kundali/basic`, body, {
-            headers: {
-                "X-API-KEY": apiKey
-            }
-        });
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+// const generateBasicKundali = async (body) => {
+//     try {
+//         const response = await axios.post(`${apiUrl}/kundali/basic`, body, {
+//             headers: {
+//                 "X-API-KEY": apiKey
+//             }
+//         });
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
 const generateCompleteKundali = async (body) => {
     try {
@@ -29,18 +29,18 @@ const generateCompleteKundali = async (body) => {
     }
 };
 
-const compareAshtakootCompatibility = async (body) => {
-    try {
-        const response = await axios.post(`${apiUrl}/compatibility/ashtakoot`, body, {
-            headers: {
-                "X-API-KEY": apiKey
-            }
-        });
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
+// const compareAshtakootCompatibility = async (body) => {
+//     try {
+//         const response = await axios.post(`${apiUrl}/compatibility/ashtakoot`, body, {
+//             headers: {
+//                 "X-API-KEY": apiKey
+//             }
+//         });
+//         return response.data;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
 
 const compareDetailedAshtakootCompatibility = async (body) => {
     try {
@@ -82,9 +82,9 @@ const checkMangalDosha = async (body) => {
 }
 
 export {
-    generateBasicKundali,
+    // generateBasicKundali,
     generateCompleteKundali,
-    compareAshtakootCompatibility,
+    // compareAshtakootCompatibility,
     compareDetailedAshtakootCompatibility,
     compareManglikCompatibility,
     checkMangalDosha

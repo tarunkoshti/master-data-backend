@@ -8,10 +8,10 @@ const getKundali = async (req, res) => {
     return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, result, 'Kundali fetched successfully'));
 };
 
-const generateAndSaveBasicKundali = async (req, res) => {
-    await kundaliService.generateAndSaveBasicKundali(req.body);
-    return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, undefined, 'Basic Kundali generated successfully'));
-};
+// const generateAndSaveBasicKundali = async (req, res) => {
+//     await kundaliService.generateAndSaveBasicKundali(req.body);
+//     return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, undefined, 'Basic Kundali generated successfully'));
+// };
 
 const generateAndSaveCompleteKundali = async (req, res) => {
     await kundaliService.generateAndSaveCompleteKundali(req.body);
@@ -19,7 +19,7 @@ const generateAndSaveCompleteKundali = async (req, res) => {
 };
 
 export const kundaliController = {
-    generateAndSaveBasicKundali,
+    // generateAndSaveBasicKundali,
     generateAndSaveCompleteKundali,
     getKundali
 };

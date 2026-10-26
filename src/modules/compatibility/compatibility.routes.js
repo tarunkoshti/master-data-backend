@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.use(authHandler);
 
-router.post('/ashtakoot', validate(calculateCompatibilitySchema), asyncHandler(compatibilityController.calculateAshtakootCompatibility));
+// router.post('/ashtakoot', validate(calculateCompatibilitySchema), asyncHandler(compatibilityController.calculateAshtakootCompatibility));
 router.post('/detailed-ashtakoot', validate(calculateCompatibilitySchema), asyncHandler(compatibilityController.calculateDetailedAshtakootCompatibility));
 router.post('/manglik', validate(calculateCompatibilitySchema), asyncHandler(compatibilityController.calculateManglikCompatibility));
 

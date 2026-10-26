@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(authHandler);
 
 router.get('/', asyncHandler(kundaliController.getKundali));
-router.post('/generate-basic-kundali', validate(generateKundaliSchema), asyncHandler(kundaliController.generateAndSaveBasicKundali));
+// router.post('/generate-basic-kundali', validate(generateKundaliSchema), asyncHandler(kundaliController.generateAndSaveBasicKundali));
 router.post('/generate-complete-kundali', validate(generateKundaliSchema), asyncHandler(kundaliController.generateAndSaveCompleteKundali));
 
 export default router;
